@@ -3,6 +3,7 @@ const cors = require('cors')
 const express = require('express')
 const mongoose = require('mongoose')
 const userRoutes = require('./routes/user')
+const programRoutes = require('./routes/program')
 const PORT = process.env.PORT || 3500
 const app = express()
 
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cors())
 //routes
 app.use('/api/user', userRoutes)
+app.use('/api/program', programRoutes)
 
 //app listening
 app.listen(PORT, () => {
