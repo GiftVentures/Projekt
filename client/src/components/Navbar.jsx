@@ -1,23 +1,36 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLogout } from '../hooks/useLogout'
 import { useAuthContext } from '../hooks/useAuthContext'
+import { jwtDecode } from 'jwt-decode'
 
 
 const Navbar = () => {
   const {logout} = useLogout()
   const { user } = useAuthContext()
+  const [isAdmin, setAdmin] = useState(false)
   const [isDropdownVisible, setDropdownVisible] = useState(false);
+
+  useEffect(() =>{
+    if (user){
+      const decodedToken=jwtDecode(user.token)
+      setAdmin(decodedToken.isAdmin)
+      console.log(isAdmin);
+    }
+  },[user])
+
 
   const handleMouseEnter = (e) => {
     e.preventDefault()
     setDropdownVisible(true);
   };
 
+
   const handleMouseLeave = (e) => {
     e.preventDefault()
     setDropdownVisible(false);
   };
+
 
   const handleClick = () => {
     logout()
@@ -28,7 +41,7 @@ const Navbar = () => {
     <header>
       <div className='container'>
         <Link to={"/"}>
-          <h1>GiftVentures</h1>
+          <h1 id='main'>GiftVentures</h1>
         </Link>
         <nav>
         <Link to={"/"}>
@@ -37,7 +50,7 @@ const Navbar = () => {
         <Link to={"/"}>
           <h1>Programok</h1>
         </Link>
-        <Link to={"/"}>
+        <Link to={"/about "}>
           <h1>Rólunk</h1>
         </Link>
           {user && (
@@ -51,9 +64,20 @@ const Navbar = () => {
                 <div className='dropdown-menu' 
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}>
-                  <Link to='/profile'>Profil</Link>
-                  <Link>Mentett Programjaim</Link>
-                  <button onClick={handleClick}>Kijelentkezés</button>
+                  <div>
+                    <div className='user-links'>
+                      <Link to='/profile'>Profil</Link>
+                      <Link>Mentett Programjaim</Link>
+                    </div>
+                    {isAdmin ? (
+                      <div className='admin-links'>
+                        <p>Admin eszközök</p>
+                        <Link to='/addprogram'>Program felvétele</Link>
+                        <Link>Programok szerkesztése</Link>
+                      </div>
+                    ) : (null)}
+                  </div>
+                  <button id='signout' onClick={handleClick}>Kijelentkezés</button>
                 </div>
               )}
               </div>
@@ -61,8 +85,8 @@ const Navbar = () => {
           )}
           {!user && (
           <div className='signupContainer'>
-            <Link to= "/signup"><button>Regisztrálj</button></Link>
-            <Link to="/login" className='login'>vagy jelentkezz be</Link>
+            <Link to= "/signup"><button className='register'>Regisztráció</button></Link>
+            <Link to="/login" className='login'>vagy bejelentkezés</Link>
           </div>
           )}
         </nav>

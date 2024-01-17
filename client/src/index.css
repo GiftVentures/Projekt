@@ -1,9 +1,10 @@
 /* google font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;800&family=VT323&display=swap');
 
-/* layout */
+
 :root {
-  --primary: #1aac83;
+  --primary: #7AB6DA;
+  --secondary: #1f2132;
   --error: #e7195a;
 }
 body {
@@ -17,7 +18,8 @@ body {
   justify-content: center;
 }
 header {
-  background: #fff;
+  background: rgb(0,0,0);
+  background: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(72,72,72,1) 28%, rgba(124,124,124,1) 50%, rgba(125,125,125,1) 70%, rgba(69,69,69,1) 100%);
 }
 header .container {
   margin: 0 auto;
@@ -31,13 +33,17 @@ header a {
   color: #333;
   text-decoration: none;
 }
+
+header #main{
+  color: white
+}
 .pages{
   max-width: 1400px;
   padding: 20px;
   margin: 0 auto;
 }
 
-/* new workout form */
+
 label, input {
   display: block;
 }
@@ -50,6 +56,7 @@ input {
   border-radius: 4px;
   box-sizing: border-box;
 }
+
 form button {
   background: var(--primary);
   border: 0;
@@ -57,8 +64,17 @@ form button {
   padding: 10px;
   font-family: "Poppins";
   border-radius: 4px;
+  transition: all 0.3s ease-out; /* Átmenet minden tulajdonságra */
   cursor: pointer;
 }
+
+form button:hover {
+  background-color: transparent;
+  color: var(--primary);
+  border-radius: 30px;
+  border: 2px solid var(--primary);
+}
+
 div.error {
   padding: 10px;
   background: #ffefef;
@@ -87,7 +103,38 @@ nav {
   align-items: center;
 }
 nav a {
-  margin-left: 10px;
+  margin-left: 10px; 
+}
+
+nav a h1 {
+  margin: 0;
+  transition: all 0.3s ease-out; /* Átmenet minden tulajdonságra */
+  position: relative;
+}
+
+nav a h1:hover{
+  color: #fff;
+}
+
+nav a h1::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+ 
+  background-color: #fff;
+  transition: width 0.3s ease-out;
+}
+
+nav a h1:hover::before {
+  width: 100%;
+  
+}
+
+nav a h1:after {
+  color: white
 }
 
 nav img {
@@ -102,13 +149,53 @@ nav .profile {
 }
 
 nav .dropdown-menu {
+  border: 1px solid black;
+  padding: 5px;
+  border-radius: 6px;
   width: max-content;
-  background-color: var(--primary);
+  background-color:var(--secondary);
   position: absolute;
   display: flex;
   flex-direction: column;
   top: 100%;
   right: 0;
+}
+
+nav .dropdown-menu div {
+  display: flex;
+  flex-direction: column;
+}
+
+nav .dropdown-menu div a:hover{
+  background-color: #343854
+}
+
+nav .dropdown-menu div p{
+  margin: 0;
+  margin-top: 20px;
+  border-bottom:1px solid black ;
+  border-bottom-style:dashed;
+  font-size: 15px;
+  color: rgb(114, 114, 114);
+}
+
+nav .dropdown-menu div a{
+  color: #fff;
+  margin-left: 0;
+
+}
+
+nav .dropdown-menu #signout{
+  background-color:var(--secondary);
+  border: 1px solid var(--error);
+  color: var(--error);
+  transition: all 0.3s ease-out; /* Átmenet minden tulajdonságra */
+
+}
+
+nav .dropdown-menu #signout:hover{
+  background-color: var(--error);
+  color: #fff;
 }
 
 .arrow {
@@ -131,8 +218,8 @@ nav .dropdown-menu {
 }
 
 nav button {
-  background: #fff;
-  color: var(--primary);
+  background: var(--primary);
+  color: #fff;
   border: 2px solid var(--primary);
   padding: 6px 10px;
   border-radius: 4px;
@@ -141,11 +228,27 @@ nav button {
   font-size: 1em;
 }
 
+
 nav .signupContainer {
   display: flex;
 }
 
+nav .signupContainer .register {
+  padding: 6px 10px;
+  border: 2px solid var(--primary);
+  transition: all 0.3s ease-out; /* Átmenet minden tulajdonságra */
+}
+
+nav .signupContainer .register:hover {
+  padding: 6px 18px;
+  background-color: transparent;
+  color: #fff;
+  border-radius: 4px;
+  border: 2px solid var(--primary);
+}
+
 nav .login {
+  color: #fff;
   height: max-content;
   text-decoration: underline;
   margin: 0;
@@ -172,4 +275,11 @@ form.changeDetails {
 form.changeDetails div {
   display: flex;
   justify-content: space-between;
+}
+
+.about-container {
+  margin: 0;
+  background-color: var(--primary) ;
+  width: 100%;
+  height: 400px
 }

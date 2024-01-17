@@ -1,21 +1,48 @@
 const Program = require('../models/programModel')
 const User = require('../models/userModel')
+const Themes = '../server/models/themes.json'
+const fs = require('fs').promises;
+
+const AddTheme = async (req, res) => {
+  try {
+    const themesData = await fs.readFile(Themes, 'utf-8');
+    const existingThemes = JSON.parse(themesData).themes;
+    const { themes: newThemes } = req.body;
+    const uniqueNewThemes = newThemes.filter((theme) => !existingThemes.includes(theme));
+    const updatedThemes = [...existingThemes, ...uniqueNewThemes];
+    await fs.writeFile(Themes, JSON.stringify({ themes: updatedThemes }));
+    res.status(200).json({ message: 'Témák sikeresen frissítve' });
+  } catch (error) {
+    console.error('Hiba a témák frissítésekor:', error);
+    res.status(500).json({ error: 'Belső szerverhiba' });
+  }
+};
+
+
+const getAllThemes = async (req, res) => {
+  try {
+    const themesData = await fs.readFile(Themes, 'utf-8');
+    const themes = JSON.parse(themesData).themes;
+    res.status(200).json(themes);
+  } catch (error) {
+    console.error('Hiba a témák lekérdezésekor:', error);
+    res.status(500).json({ error: 'Belső szerverhiba' });
+  }
+};
 
 
 const AddProgram = async (req, res) => {
     const { name, description, img, price, persons, location, theme, date } = req.body;
     const userId = req.user._id;
-  
     try {
       const user = await User.findById(userId);
-  
       if (!user || !user.isAdmin) {
         return res.status(403).json("Ez a művelet csak admin felhaználónak engedélyezett!");
       }
-  
       const program = await Program.add(name, description, img, price, persons, location, theme, date);
-  
-      res.status(201).json("Program sikeresen felvéve");
+      if (program){
+        res.status(201).json("Program sikeresen felvéve");
+      }
     } catch (error) {
       console.error(error);
       res.status(500).json("Belső szerverhiba történt");
@@ -25,20 +52,15 @@ const AddProgram = async (req, res) => {
   const DeleteProgram = async (req, res) => {
     const programId = req.params.id;
     console.log("Received programId:", programId);
-  
     try {
       const user = await User.findById(req.user._id);
-  
       if (!user || !user.isAdmin) {
         return res.status(403).json("Ez a művelet csak admin felhaználónak engedélyezett!");
       }
-  
       const deletedProgram = await Program.delete(programId);
-  
       if (!deletedProgram) {
         return res.status(404).json("A program nem található");
       }
-  
       res.status(200).json("Sikeres törlés");
     } catch (error) {
       console.error(error);
@@ -46,4 +68,4 @@ const AddProgram = async (req, res) => {
     }
   };
 
-  module.exports = { AddProgram, DeleteProgram };
+  module.exports = { AddProgram, DeleteProgram, AddTheme, getAllThemes };

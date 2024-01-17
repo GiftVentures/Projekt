@@ -38,12 +38,22 @@ const Signup = () => {
       });
     };
 
+    const validateName = (name) => {
+      // Reguláris kifejezés: csak betűk, szóközök, kötőjelek
+      const nameRegex = /^[a-zA-ZáéíóúüőűÁÉÍÓÚÜŐŰ-]+$/;
+      return nameRegex.test(name);
+    };
+
     const renderRequirementStatus = (isMet) => {
       return isMet ? <span style={{ color: 'green' }}>✔</span> : <span style={{ color: 'red' }}>✘</span>;
     };
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!validateName(firstName) || !validateName(secondName)){
+      setDisplayedError("A nevedben nem lehetnek számok")
+      return;
+    }
     if (password === confirmPassword){
       setDisplayedError(null)
       await signup(email, firstName, secondName, password )
@@ -54,7 +64,7 @@ const Signup = () => {
 
   return (
     <form className='signup' onSubmit={handleSubmit}>
-      <h3>Sign up</h3>
+      <h3>Regisztráció</h3>
 
       <label>Email:</label>
       <input 
@@ -94,20 +104,20 @@ const Signup = () => {
         <p>Jelszónak tartalmaznia kell:</p>
         <ul>
           <li>
-            Legalább 8 karakter: {renderRequirementStatus(passwordRequirementsMet.length)}
+            Legalább 8 karaktert: {renderRequirementStatus(passwordRequirementsMet.length)}
           </li>
           <li>
             Kis- és nagybetűket: {renderRequirementStatus(passwordRequirementsMet.lowercase && passwordRequirementsMet.uppercase)}
           </li>
           <li>
-            Számot: {renderRequirementStatus(passwordRequirementsMet.number)}
+            Legalább egy Számot: {renderRequirementStatus(passwordRequirementsMet.number)}
           </li>
           <li>
             Legalább egy speciális karaktert: {renderRequirementStatus(passwordRequirementsMet.specialChar)}
           </li>
         </ul>
       </div>
-      <button disabled={isLoading}>Sign Up</button>
+      <button disabled={isLoading}>Regisztráció</button>
       {displayedError && <div className='error'>{displayedError}</div>}
       {!displayedError && error && <div className='error'>{error}</div>}
     </form>

@@ -14,7 +14,7 @@ const programSchema = new Schema({
   },
   img:{
     type: String,
-    required: true
+    required: false
   },
   price: {
     type: Number,
@@ -78,7 +78,7 @@ programSchema.statics.add = async function (
   if (
     !name ||
     !description ||
-    !img||
+    //!img||
     !price ||
     !persons ||
     !location ||
