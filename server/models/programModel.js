@@ -6,14 +6,13 @@ const programSchema = new Schema({
   name: {
     type: String,
     required: true,
-    unique: true,
   },
   description: {
     type: String,
     required: true,
   },
   img:{
-    type: String,
+    type: Object,
     required: false
   },
   price: {

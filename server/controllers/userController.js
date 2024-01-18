@@ -1,7 +1,39 @@
 const User = require('../models/userModel')
+require('dotenv').config()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const validator = require('validator')
+const nodeMailer = require('nodemailer')
+const {welcomeMail} = require('../mails/welcome')
+
+const sendMail = async (name, recipientEmail) => {
+    const html = welcomeMail(name);
+
+    const transporter = nodeMailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+            user: process.env.SENDER_EMAIL, // A Gmail címed
+            pass: process.env.SENDER_EMAIL_PASSWORD // A Gmail jelszavad
+        }
+    });
+
+    // Levél küldése
+    const mailOptions = {
+        from: `GiftVentures <${process.env.SENDER_EMAIL}>`,
+        to: recipientEmail, // A címzett e-mail címe
+        subject: 'Regisztráció',
+        html: html
+    };
+
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log('E-mail elküldve:', info.response);
+    } catch (error) {
+        console.error('Hiba az e-mail küldésekor:', error);
+    }
+};
 
 
 const createToken = (_id, isAdmin) =>{
@@ -26,6 +58,9 @@ const signupUser = async (req, res) => {
         const user = await User.signup(email, firstName, secondName, password)
         const id = user._id
         const token = createToken(user._id)
+        if (token) {
+            sendMail(user.firstName, user.email)
+        }
         res.status(200).json({id, token})
     }catch(error){
         res.status(400).json({error: error.message})

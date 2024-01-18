@@ -13,6 +13,14 @@ body {
   font-family: "Poppins";
 }
 
+.loading{
+  cursor:progress;
+}
+
+.loading button:disabled{
+  background-color: grey;
+}
+
 .accessDenied{
   display: flex;
   justify-content: center;

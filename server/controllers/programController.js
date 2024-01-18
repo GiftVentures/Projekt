@@ -1,7 +1,36 @@
+const cloudinary = require('cloudinary');
 const Program = require('../models/programModel')
 const User = require('../models/userModel')
 const Themes = '../server/models/themes.json'
 const fs = require('fs').promises;
+
+cloudinary.v2.config({
+  cloud_name: 'dqd9anzyv',
+  api_key: '222231436833177',
+  api_secret: 'MPMOkw2k7DEq7Ujn_ca5rpHcBaE',
+  secure: true,
+});
+
+const uploadImage = async (req, res) => {
+  // Access the uploaded file using req.file
+  const imageBuffer = req.file.buffer.toString('base64');
+
+  // Your existing code
+  const options = {
+    use_filename: true,
+    unique_filename: false,
+    overwrite: true,
+  };
+
+  try {
+    const result = await cloudinary.uploader.upload(`data:image/png;base64,${imageBuffer}`, options);
+    console.log(result);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Belső szerverhiba' });
+  }
+};
 
 const AddTheme = async (req, res) => {
   try {
@@ -39,6 +68,8 @@ const AddProgram = async (req, res) => {
       if (!user || !user.isAdmin) {
         return res.status(403).json("Ez a művelet csak admin felhaználónak engedélyezett!");
       }
+      
+
       const program = await Program.add(name, description, img, price, persons, location, theme, date);
       if (program){
         res.status(201).json("Program sikeresen felvéve");
@@ -68,4 +99,4 @@ const AddProgram = async (req, res) => {
     }
   };
 
-  module.exports = { AddProgram, DeleteProgram, AddTheme, getAllThemes };
+  module.exports = { AddProgram, DeleteProgram, AddTheme, getAllThemes, uploadImage};
