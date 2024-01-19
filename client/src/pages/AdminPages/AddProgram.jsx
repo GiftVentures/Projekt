@@ -51,13 +51,17 @@ const AddProgram = () => {
  const handleAddTheme = (e) => {
     e.preventDefault()
     if(customTheme && !theme.includes(customTheme)){
+      console.log(customTheme);
         setTheme([...theme, customTheme])
         setCustomTheme("")
+        return;
     }
-    else if (chosenThemes && !theme.includes(chosenThemes)){
-        
-        setTheme([...theme, ...chosenThemes])
-        setChosenThemes([])
+
+    if (chosenThemes && !theme.includes(chosenThemes)){
+      const updatedExistingThemes = existingThemes.filter((t) => !chosenThemes.includes(t));
+      setTheme([...theme, ...chosenThemes]);
+      setExistingThemes(updatedExistingThemes);
+      setChosenThemes([]);
     }
   }
 

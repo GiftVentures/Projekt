@@ -2,6 +2,7 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import { jwtDecode } from 'jwt-decode'
 import { useAuthContext } from './hooks/useAuthContext'
 import { useEffect, useState } from 'react';
+import { TransparentNavbar } from './TransparentNavbar';
 
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -11,6 +12,7 @@ import Profile from './pages/Profile';
 import ChangePassword from './pages/ChangePassword';
 import About from './pages/About';
 import AddProgram from './pages/AdminPages/AddProgram';
+import Error404 from './pages/Error404';
 
 function App() {
   const { user } = useAuthContext()
@@ -28,8 +30,10 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Navbar />
+        <TransparentNavbar />
           <Routes>
             <Route path="/" element={<Main />}/>
+            <Route path="*" element={<Error404 />}/>
             <Route path="/about" element={<About />}/>
             {user ? (
               <>

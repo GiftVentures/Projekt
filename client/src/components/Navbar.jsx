@@ -38,7 +38,7 @@ const Navbar = () => {
   }
 
   return (
-    <header>
+    <header id='header' className='header'>
       <div className='container'>
         <Link to={"/"}>
           <h1 id='main'>GiftVentures</h1>
