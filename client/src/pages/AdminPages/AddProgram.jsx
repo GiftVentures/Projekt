@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useAuthContext } from "../../hooks/useAuthContext";
 
 const AddProgram = () => {
-  const [temporaryHour, setTemporaryHour] = useState("");
   const [existingThemes, setExistingThemes] = useState([]);
   const [chosenThemes, setChosenThemes] = useState([]);
   const [customTheme, setCustomTheme] = useState("");
@@ -17,10 +16,13 @@ const AddProgram = () => {
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
   const [theme, setTheme] = useState([]);
-  const [day, setDay] = useState("");
-  const [hours, setHours] = useState([]);
-  const [date, setDate] = useState({})
+  const [displayedError, setDisplayedError] = useState(null);
+  const [date, setDate] = useState([]);
   const { user } = useAuthContext();
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedHour, setSelectedHour] = useState("");
+
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,33 +37,33 @@ const AddProgram = () => {
     if (user) {
       fetchData();
     }
+    
   }, [user]);
 
-  const handleAddDate = (e) =>{
-    e.preventDefault();
-
-    if (day){
-      setDate(...date, day)
-    }
-    setDay(" ")
-  }
-
-  const handleAddHour = (e) => {
-    e.preventDefault();
-    if (temporaryHour &&!hours.includes(temporaryHour) ) {
-      setHours([...hours, temporaryHour]);
-      setTemporaryHour("");
+  const handleAddDate = () => {
+    if (selectedDate && selectedHour) {
+      const existingDateIndex = date.findIndex(
+        (dateItem) => dateItem.day === selectedDate
+      );
+  
+      if (existingDateIndex !== -1) {
+        const isHourExist = date[existingDateIndex].hours.includes(selectedHour);
+  
+        if (isHourExist) {
+          return;
+        }
+  
+        const updatedDate = [...date];
+        updatedDate[existingDateIndex].hours.push(selectedHour);
+        setDate(updatedDate);
+      } else {
+        setDate([...date, { day: selectedDate, hours: [selectedHour] }]);
+      }
     }
   };
 
   const handleAddTheme = (e) => {
     e.preventDefault();
-    if (customTheme && customTheme != " " && !theme.includes(customTheme)) {
-      console.log(customTheme);
-      setTheme([...theme, customTheme]);
-      setCustomTheme("");
-      return;
-    }
 
     if (chosenThemes && !theme.includes(chosenThemes)) {
       const updatedExistingThemes = existingThemes.filter(
@@ -76,11 +78,16 @@ const AddProgram = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!name || !description || !imageFile || !price || !minPersons || !maxPersons || !county || !city || !address || theme.length === 0 || date.length === 0) {
+      setDisplayedError("Minden mező kitöltése kötelező!");
+      return;
+    }
+  
     try {
       setIsUploading(true);
       const formData = new FormData();
       formData.append("image", imageFile);
-
+  
       const response = await fetch(
         "http://localhost:3500/api/program/img/upload",
         {
@@ -91,7 +98,7 @@ const AddProgram = () => {
           body: formData,
         }
       );
-
+  
       if (response.ok) {
         const image = await response.json();
         try {
@@ -114,34 +121,10 @@ const AddProgram = () => {
                 persons: { min: minPersons, max: maxPersons },
                 location: { county, city, address },
                 theme,
-                date: [{ day, hours }],
+                date,
               }),
             }
           );
-          if (response.ok) {
-            console.log(response);
-            try {
-              const response = await fetch(
-                "http://localhost:3500/api/program/theme/add",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${user.token}`,
-                  },
-                  body: JSON.stringify({
-                    themes: theme,
-                  }),
-                }
-              );
-              const json = await response.json();
-              if (response.ok) {
-                console.log(json);
-              }
-            } catch (error) {
-              console.log(error);
-            }
-          }
         } catch (error) {
           console.error("Error updating user:", error);
         }
@@ -149,7 +132,6 @@ const AddProgram = () => {
     } catch (error) {
       console.log(error);
     } finally {
-      setTemporaryHour("");
       setChosenThemes([]);
       setCustomTheme("");
       setName("");
@@ -162,8 +144,8 @@ const AddProgram = () => {
       setCity("");
       setAddress("");
       setTheme([]);
-      setDay("");
-      setHours([]);
+      setSelectedDate("");
+      setSelectedHour("");
       setIsUploading(false);
     }
   };
@@ -203,12 +185,16 @@ const AddProgram = () => {
           </div>
 
           <div id="img">
-            <label htmlFor="img"><h3>Kép:</h3></label>
+            <label htmlFor="img">
+              <h3>Kép:</h3>
+            </label>
             <input type="file" id="img" onChange={handleImageChange} />
           </div>
 
           <div id="price">
-            <label htmlFor="price"><h3>Ár:</h3></label>
+            <label htmlFor="price">
+              <h3>Ár:</h3>
+            </label>
             <input
               type="number"
               id="price"
@@ -264,7 +250,9 @@ const AddProgram = () => {
           </div>
 
           <div id="themes">
-            <label htmlFor="theme"><h3>Témák</h3></label>
+            <label htmlFor="theme">
+              <h3>Témák</h3>
+            </label>
             <p>Hozzáadott témák:</p>
             <div>
               {theme.map((element, index, array) => (
@@ -312,36 +300,33 @@ const AddProgram = () => {
             <label htmlFor="day">Nap</label>
             <input
               type="date"
-              value={day}
-              onChange={(e) => setDay(e.target.value)}
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
             />
 
-            {day ? (
+            {selectedDate ? (
               <>
-              
                 <label htmlFor="hours"></label>
                 <input
-                  type="time"            
-                  value={temporaryHour}
-                  onChange={(e) => setTemporaryHour(e.target.value)}
+                  type="time"
+                  value={selectedHour}
+                  onChange={(e) => setSelectedHour(e.target.value)}
                 />
                 <button
                   disabled={isUploading}
                   type="button"
-                  onClick={handleAddHour}
+                  onClick={handleAddDate}
                 >
-                  Óra hozzáadása
+                  Időpont hozzáadása
                 </button>
                 <div id="addedHours">
-                  <p>
-                    Időpontok hozzáadva:&nbsp; {" "}
-                    {hours.map((hour) => (
-                      <p>{hour}, &nbsp;</p>
-                    ))}
-                  </p>
-              </div>
-              <button type="button">Nap felvétele</button>
-
+                  <p>Időpontok hozzáadva:</p>
+                  {date.map((dateItem) => (
+                    <p key={dateItem.day}>
+                      {dateItem.day}: {dateItem.hours.join(", ")}
+                    </p>
+                  ))}
+                </div>
               </>
             ) : null}
           </div>
@@ -351,6 +336,7 @@ const AddProgram = () => {
             </button>
           </div>
         </form>
+          {displayedError && <div className='error'>{displayedError}</div>}
       </div>
     </div>
   );

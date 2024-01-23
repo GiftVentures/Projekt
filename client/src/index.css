@@ -92,14 +92,6 @@ form button:hover {
   border: 2px solid var(--primary);
 }
 
-div.error {
-  padding: 10px;
-  background: #ffefef;
-  border: 1px solid var(--error);
-  color: var(--error);
-  border-radius: 4px;
-  margin: 20px 0;
-}
 div.success {
   padding: 10px;
   background: #ffefef;
@@ -528,3 +520,12 @@ form.addProgram #submitButton button{
   width: 20vw;
 }
 
+.error {
+  text-align: center;
+  padding: 10px;
+  background: #ffefef;
+  border: 1px solid var(--error);
+  color: var(--error);
+  border-radius: 4px;
+
+}

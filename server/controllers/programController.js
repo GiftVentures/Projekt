@@ -32,22 +32,6 @@ const uploadImage = async (req, res) => {
   }
 };
 
-const AddTheme = async (req, res) => {
-  try {
-    const themesData = await fs.readFile(Themes, 'utf-8');
-    const existingThemes = JSON.parse(themesData).themes;
-    const { themes: newThemes } = req.body;
-    const uniqueNewThemes = newThemes.filter((theme) => !existingThemes.includes(theme));
-    const updatedThemes = [...existingThemes, ...uniqueNewThemes];
-    await fs.writeFile(Themes, JSON.stringify({ themes: updatedThemes }));
-    res.status(200).json({ message: 'Témák sikeresen frissítve' });
-  } catch (error) {
-    console.error('Hiba a témák frissítésekor:', error);
-    res.status(500).json({ error: 'Belső szerverhiba' });
-  }
-};
-
-
 const getAllThemes = async (req, res) => {
   try {
     const themesData = await fs.readFile(Themes, 'utf-8');
@@ -99,4 +83,4 @@ const AddProgram = async (req, res) => {
     }
   };
 
-  module.exports = { AddProgram, DeleteProgram, AddTheme, getAllThemes, uploadImage};
+  module.exports = { AddProgram, DeleteProgram, getAllThemes, uploadImage};
