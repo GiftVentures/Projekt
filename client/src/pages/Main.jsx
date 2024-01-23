@@ -5,12 +5,17 @@ const Main = () => {
 
   useEffect(() => {
     let vid = document.getElementById("bgvideo");
+    
 
     const handleTimeUpdate = () => {
+      if(vid.currentTime > 7){
+        vid.playbackRate = 2
+      }
       if (vid.currentTime > 21) {
         vid.pause();
         vid.removeEventListener("timeupdate", handleTimeUpdate);
       }
+
     };
     vid.addEventListener("timeupdate", handleTimeUpdate);
     return () => {

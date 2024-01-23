@@ -19,6 +19,7 @@ const AddProgram = () => {
   const [theme, setTheme] = useState([]);
   const [day, setDay] = useState("");
   const [hours, setHours] = useState([]);
+  const [date, setDate] = useState({})
   const { user } = useAuthContext();
 
   useEffect(() => {
@@ -36,9 +37,18 @@ const AddProgram = () => {
     }
   }, [user]);
 
+  const handleAddDate = (e) =>{
+    e.preventDefault();
+
+    if (day){
+      setDate(...date, day)
+    }
+    setDay(" ")
+  }
+
   const handleAddHour = (e) => {
     e.preventDefault();
-    if (!hours.includes(temporaryHour)) {
+    if (temporaryHour &&!hours.includes(temporaryHour) ) {
       setHours([...hours, temporaryHour]);
       setTemporaryHour("");
     }
@@ -46,7 +56,7 @@ const AddProgram = () => {
 
   const handleAddTheme = (e) => {
     e.preventDefault();
-    if (customTheme && !theme.includes(customTheme)) {
+    if (customTheme && customTheme != " " && !theme.includes(customTheme)) {
       console.log(customTheme);
       setTheme([...theme, customTheme]);
       setCustomTheme("");
@@ -173,7 +183,7 @@ const AddProgram = () => {
         <h2>Program felvétele</h2>
         <form className="addProgram" onSubmit={handleSubmit}>
           <div id="name">
-            <label htmlFor="name">Név:</label>
+            <label htmlFor="name">Név: &nbsp;</label>
             <input
               type="text"
               id="name"
@@ -277,7 +287,7 @@ const AddProgram = () => {
               <option value="" disabled>
                 Válassz témát...
               </option>
-              {existingThemes.map((t) => (
+              {existingThemes.sort().map((t) => (
                 <option key={t} value={t}>
                   {t}
                 </option>
@@ -308,16 +318,10 @@ const AddProgram = () => {
 
             {day ? (
               <>
-                <p>
-                  Időpontok hozzáadva:{" "}
-                  {hours.map((hour) => (
-                    <p>{hour}</p>
-                  ))}
-                </p>
+              
                 <label htmlFor="hours"></label>
                 <input
-                  type="text"
-                  placeholder="Adj meg egy dátumot, vagy egy időintervallumot"
+                  type="time"            
                   value={temporaryHour}
                   onChange={(e) => setTemporaryHour(e.target.value)}
                 />
@@ -328,12 +332,24 @@ const AddProgram = () => {
                 >
                   Óra hozzáadása
                 </button>
+                <div id="addedHours">
+                  <p>
+                    Időpontok hozzáadva:&nbsp; {" "}
+                    {hours.map((hour) => (
+                      <p>{hour}, &nbsp;</p>
+                    ))}
+                  </p>
+              </div>
+              <button type="button">Nap felvétele</button>
+
               </>
             ) : null}
           </div>
-          <button disabled={isUploading} type="submit">
-            Hozzáadás
-          </button>
+          <div id="submitButton">
+            <button disabled={isUploading} type="submit">
+              Hozzáadás
+            </button>
+          </div>
         </form>
       </div>
     </div>
