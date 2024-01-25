@@ -13,6 +13,7 @@ import ChangePassword from './pages/ChangePassword';
 import About from './pages/About';
 import AddProgram from './pages/AdminPages/AddProgram';
 import Error404 from './pages/Error404';
+import Programs from './pages/Programs';
 
 function App() {
   const { user } = useAuthContext()
@@ -35,6 +36,8 @@ function App() {
             <Route path="/" element={<Main />}/>
             <Route path="*" element={<Error404 />}/>
             <Route path="/about" element={<About />}/>
+            <Route path="/programs" element={<Programs />}/>
+
             {user ? (
               <>
                 <Route path="/profile" element={<Profile />}/>

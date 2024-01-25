@@ -527,5 +527,48 @@ form.addProgram #submitButton button{
   border: 1px solid var(--error);
   color: var(--error);
   border-radius: 4px;
+}
 
+.program-container {
+  text-align: center;
+  display: flex;
+  overflow: hidden;
+}
+
+.filters {
+  background-color: var(--secondary);
+  width: 25%;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.programs {
+
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  overflow-y: scroll;
+  height: 87vh; 
+}
+
+.programs h2 {
+  grid-column: span 3;
+}
+
+.program img {
+  width: 15vw;
+  height: 15vw;
+  border-radius: 30px;
+}
+
+.program {
+  margin: auto;
+  border: 1px solid var(--secondary);
+  border-radius: 30px;
+  overflow: hidden;
+  height: 50vh;
+  width: 15vw;
+  padding: 10px;
+  background-color: var(--primary);
 }

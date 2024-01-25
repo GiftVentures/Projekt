@@ -47,7 +47,7 @@ const Navbar = () => {
         <Link to={"/"}>
           <h1>Főoldal</h1>
         </Link>
-        <Link to={"/"}>
+        <Link to={"/programs"}>
           <h1>Programok</h1>
         </Link>
         <Link to={"/about "}>
