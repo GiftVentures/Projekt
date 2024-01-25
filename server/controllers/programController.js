@@ -83,4 +83,15 @@ const AddProgram = async (req, res) => {
     }
   };
 
-  module.exports = { AddProgram, DeleteProgram, getAllThemes, uploadImage};
+  const getAllPrograms = async (req, res) => {
+    try {
+      const programs = await Program.find();
+      res.status(200).json(programs);
+    } catch (error) {
+      console.error('Error fetching programs:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  };
+  
+
+  module.exports = { AddProgram, DeleteProgram, getAllThemes, uploadImage, getAllPrograms};

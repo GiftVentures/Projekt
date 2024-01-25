@@ -6,7 +6,9 @@ const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-const {AddProgram, DeleteProgram,  getAllThemes, uploadImage} = require('../controllers/programController')
+const {AddProgram, DeleteProgram,  getAllThemes, uploadImage, getAllPrograms} = require('../controllers/programController')
+
+router.get("/get", getAllPrograms )
 
 router.use(requireAuth)
 
