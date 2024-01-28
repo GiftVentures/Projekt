@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuthContext } from "../../hooks/useAuthContext";
+import jsonData from "../../data/megyek.json";
 
 const AddProgram = () => {
   const [existingThemes, setExistingThemes] = useState([]);
@@ -22,7 +23,31 @@ const AddProgram = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedHour, setSelectedHour] = useState("");
 
-  
+  const [counties, setCounties] = useState([]);
+  const [filteredCounties, setFilteredCounties] = useState([]);
+  const [cities, setCities] = useState([]);
+
+  useEffect(() => {
+    console.log(cities);
+  }, [cities]);
+
+  const handleCitySelection = (selectedCity) => {
+    setCity(selectedCity);
+  };
+
+  useEffect(() => {
+    
+    const countyNames = Object.keys(jsonData.megyek);
+    setCounties(countyNames);
+    setFilteredCounties(countyNames);
+  }, []);
+
+  const handleCountySelection = (selectedCounty) => {
+    setCounty(selectedCounty);
+
+    const citiesOfSelectedCounty = jsonData.megyek[selectedCounty].telepulesek;
+    setCities(citiesOfSelectedCounty);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,7 +62,6 @@ const AddProgram = () => {
     if (user) {
       fetchData();
     }
-    
   }, [user]);
 
   const handleAddDate = () => {
@@ -45,14 +69,15 @@ const AddProgram = () => {
       const existingDateIndex = date.findIndex(
         (dateItem) => dateItem.day === selectedDate
       );
-  
+
       if (existingDateIndex !== -1) {
-        const isHourExist = date[existingDateIndex].hours.includes(selectedHour);
-  
+        const isHourExist =
+          date[existingDateIndex].hours.includes(selectedHour);
+
         if (isHourExist) {
           return;
         }
-  
+
         const updatedDate = [...date];
         updatedDate[existingDateIndex].hours.push(selectedHour);
         setDate(updatedDate);
@@ -78,16 +103,28 @@ const AddProgram = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !description || !imageFile || !price || !minPersons || !maxPersons || !county || !city || !address || theme.length === 0 || date.length === 0) {
+    if (
+      !name ||
+      !description ||
+      !imageFile ||
+      !price ||
+      !minPersons ||
+      !maxPersons ||
+      !county ||
+      !city ||
+      !address ||
+      theme.length === 0 ||
+      date.length === 0
+    ) {
       setDisplayedError("Minden mező kitöltése kötelező!");
       return;
     }
-  
+
     try {
       setIsUploading(true);
       const formData = new FormData();
       formData.append("image", imageFile);
-  
+
       const response = await fetch(
         "http://localhost:3500/api/program/img/upload",
         {
@@ -98,7 +135,7 @@ const AddProgram = () => {
           body: formData,
         }
       );
-  
+
       if (response.ok) {
         const image = await response.json();
         try {
@@ -224,24 +261,43 @@ const AddProgram = () => {
 
           <div id="location">
             <h3>Hely</h3>
-            <label htmlFor="county">Megye</label>
-            <input
-              type="text"
+            <label htmlFor="county">Vármegye</label>
+            <select
               id="county"
               value={county}
-              onChange={(e) => setCounty(e.target.value)}
-            />
+              onChange={(e) => handleCountySelection(e.target.value)}
+            >
+              <option value="" disabled>
+                Válassz vármegyét...
+              </option>
+              {filteredCounties.map((county) => (
+                <option key={county} value={county}>
+                  {county}
+                </option>
+              ))}
+            </select>
 
             <label htmlFor="city">Város</label>
-            <input
-              type="text"
+            <select
               id="city"
               value={city}
-              onChange={(e) => setCity(e.target.value)}
-            />
+              disabled = {!county}
+              onChange={(e) => handleCitySelection(e.target.value)}
+            >
+              <option value="" disabled>
+                Válassz várost...
+              </option>
+              {
+                cities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+            </select>
 
             <label htmlFor="address">Cím</label>
             <input
+              disabled = {!city }
               type="text"
               id="address"
               value={address}
@@ -336,7 +392,7 @@ const AddProgram = () => {
             </button>
           </div>
         </form>
-          {displayedError && <div className='error'>{displayedError}</div>}
+        {displayedError && <div className="error">{displayedError}</div>}
       </div>
     </div>
   );

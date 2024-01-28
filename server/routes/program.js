@@ -9,13 +9,13 @@ const upload = multer({ storage: storage });
 const {AddProgram, DeleteProgram,  getAllThemes, uploadImage, getAllPrograms} = require('../controllers/programController')
 
 router.get("/get", getAllPrograms )
+router.get("/theme", getAllThemes)
 
 router.use(requireAuth)
 
 router.post("/add", AddProgram)
 router.delete("/delete/:id", DeleteProgram)
 
-router.get("/theme", getAllThemes)
 
 router.post("/img/upload", upload.single('image'), uploadImage)
 
