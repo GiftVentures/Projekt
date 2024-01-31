@@ -14,15 +14,15 @@ const sendMail = async (name, recipientEmail) => {
         port: 465,
         secure: true,
         auth: {
-            user: process.env.SENDER_EMAIL, // A Gmail címed
-            pass: process.env.SENDER_EMAIL_PASSWORD // A Gmail jelszavad
+            user: process.env.SENDER_EMAIL, 
+            pass: process.env.SENDER_EMAIL_PASSWORD 
         }
     });
 
     // Levél küldése
     const mailOptions = {
         from: `GiftVentures <${process.env.SENDER_EMAIL}>`,
-        to: recipientEmail, // A címzett e-mail címe
+        to: recipientEmail, 
         subject: 'Regisztráció',
         html: html
     };

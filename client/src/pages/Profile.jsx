@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useUserdataContext } from "../hooks/useUserdataContext";
+import { useLogout } from '../hooks/useLogout'
 import UpdateUserdata from '../components/UpdateUserdata'
 import AccessDenied from "../components/AccessDenied";
 
 const Profile = () => {
+  const {logout} = useLogout()
   const { user } = useAuthContext();
   const { userdata, dispatch } = useUserdataContext();
   const [isUpdating, setIsUpdating] = useState(false);
@@ -26,6 +28,9 @@ const Profile = () => {
 
       if (response.ok) {
         dispatch({ type: "GET_USERDATA", payload: json });
+      }
+      else {
+        logout()
       }
     };
 

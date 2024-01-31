@@ -5,9 +5,9 @@ const Themes = '../server/models/themes.json'
 const fs = require('fs').promises;
 
 cloudinary.v2.config({
-  cloud_name: 'dqd9anzyv',
-  api_key: '222231436833177',
-  api_secret: 'MPMOkw2k7DEq7Ujn_ca5rpHcBaE',
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
   secure: true,
 });
 
