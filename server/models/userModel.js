@@ -41,6 +41,9 @@ const userSchema = new Schema({
         required: false,
         default: ""
     },
+    savedPrograms: [
+
+    ],
     isAdmin:{
         type:Boolean,
         required: false,
@@ -98,5 +101,6 @@ userSchema.statics.login = async function (email,password) {
 
     return user
 }
+
 
 module.exports = mongoose.model('User', userSchema)

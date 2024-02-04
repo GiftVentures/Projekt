@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import jsonData from "../data/megyek.json";
+import ProgramSaveButton from "../components/ProgramSaveButton";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const Programs = () => {
+  const { user } = useAuthContext();
+
   const [programs, setPrograms] = useState([]);
   const [themes, setThemes] = useState([]);
   const [selectedThemes, setSelectedThemes] = useState([]);
@@ -13,14 +17,41 @@ const Programs = () => {
 
   const [maxPrice, setMaxPrice] = useState(1000000);
 
-  const [startDate, setStartDate] = useState(""); 
-  const [endDate, setEndDate] = useState(""); 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const [city, setCity] = useState("");
   const [county, setCounty] = useState("");
   const [counties, setCounties] = useState([]);
   const [filteredCounties, setFilteredCounties] = useState([]);
   const [cities, setCities] = useState([]);
+
+  const [savedPrograms, setSavedPrograms] = useState(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch("http://localhost:3500/api/user/data", {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+
+        if (response.ok) {
+          const resp = await response.json();
+          setSavedPrograms(resp.savedPrograms);
+        } else {
+          console.error("Failed to fetch user data");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    if (user) {
+      fetchUserData();
+    }
+  }, [user]);
 
   useEffect(() => {
     const countyNames = Object.keys(jsonData.megyek);
@@ -43,7 +74,6 @@ const Programs = () => {
         console.error("Error fetching programs:", error);
       }
     };
-    
 
     const fetchThemes = async () => {
       try {
@@ -96,8 +126,8 @@ const Programs = () => {
               program.theme.includes(selectedTheme)
             )) &&
           // Dátumszűrés
-          (!startDate || program.date.some(date => date.day >= startDate)) &&
-          (!endDate || program.date.some(date => date.day <= endDate)) &&
+          (!startDate || program.date.some((date) => date.day >= startDate)) &&
+          (!endDate || program.date.some((date) => date.day <= endDate)) &&
           (!county || program.location.county === county) && // Megye szűrés
           (!city || program.location.city === city) // Város szűrés
       )
@@ -113,9 +143,21 @@ const Programs = () => {
     setStartDate("");
     setEndDate("");
     setSearchClicked(true);
-    setCounty("")
-    setCity("")
-    setFilteredPrograms(programs); 
+    setCounty("");
+    setCity("");
+    setFilteredPrograms(programs);
+  };
+
+  const handleProgramSave = async (programId) => {
+    console.log(programId);
+    const response = await fetch("http://localhost:3500/api/user/update", {
+      method: "POST", // Assuming you are sending data as a POST request
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+      body: JSON.stringify({ programId }),
+    })
   };
 
   return (
@@ -176,40 +218,37 @@ const Programs = () => {
         </div>
 
         <div className="location">
-            <label htmlFor="county">Vármegye</label>
-            <select
-              id="county"
-              value={county}
-              onChange={(e) => handleCountySelection(e.target.value)}
-            >
-              <option value="" disabled>
-                Válassz vármegyét...
+          <label htmlFor="county">Vármegye</label>
+          <select
+            id="county"
+            value={county}
+            onChange={(e) => handleCountySelection(e.target.value)}
+          >
+            <option value="" disabled>
+              Válassz vármegyét...
+            </option>
+            {filteredCounties.map((county) => (
+              <option key={county} value={county}>
+                {county}
               </option>
-              {filteredCounties.map((county) => (
-                <option key={county} value={county}>
-                  {county}
-                </option>
-              ))}
-            </select>
+            ))}
+          </select>
 
-            <label htmlFor="city">Város</label>
-            <select
-              id="city"
-              value={city}
-              disabled = {!county}
-              onChange={(e) => handleCitySelection(e.target.value)}
-            >
-              <option value="" >
-                Bármi
+          <label htmlFor="city">Város</label>
+          <select
+            id="city"
+            value={city}
+            disabled={!county}
+            onChange={(e) => handleCitySelection(e.target.value)}
+          >
+            <option value="">Bármi</option>
+            {cities.map((city) => (
+              <option key={city} value={city}>
+                {city}
               </option>
-              {
-                cities.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-            </select>
-          </div>
+            ))}
+          </select>
+        </div>
         <div className="buttons">
           <button onClick={handleReset}>Visszaállítás</button>
           <button onClick={handleSearch}>Keresés</button>
@@ -231,15 +270,23 @@ const Programs = () => {
               <div>
                 <p>Hely:</p>
                 <p>
-                  {program.location.county} vármegye, &nbsp;{program.location.city},&nbsp;
+                  {program.location.county} vármegye, &nbsp;
+                  {program.location.city},&nbsp;
                   {program.location.address}
                 </p>
               </div>
               <div>
                 <p>Ár:</p>
                 <p>{program.price} Ft/fő</p>
-              </div>           
+              </div>
             </div>
+            {user ? (
+              <ProgramSaveButton
+                savedPrograms={savedPrograms}
+                programId={program._id} // A program azonosítója
+                onProgramSave={(programId) => handleProgramSave(programId)}
+              />
+            ) : null}
           </div>
         ))}
       </div>

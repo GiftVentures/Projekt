@@ -14,15 +14,15 @@ const sendMail = async (name, recipientEmail) => {
         port: 465,
         secure: true,
         auth: {
-            user: process.env.SENDER_EMAIL, 
-            pass: process.env.SENDER_EMAIL_PASSWORD 
+            user: process.env.SENDER_EMAIL, // A Gmail címed
+            pass: process.env.SENDER_EMAIL_PASSWORD // A Gmail jelszavad
         }
     });
 
     // Levél küldése
     const mailOptions = {
         from: `GiftVentures <${process.env.SENDER_EMAIL}>`,
-        to: recipientEmail, 
+        to: recipientEmail, // A címzett e-mail címe
         subject: 'Regisztráció',
         html: html
     };
@@ -70,7 +70,7 @@ const signupUser = async (req, res) => {
 const getUserData = async (req, res) => {
     const userId = req.user._id; 
     try {
-        const user = await User.findOne({ _id: userId }, 'email firstName secondName mobile birthDate placeOfBirth address');
+        const user = await User.findOne({ _id: userId }, 'email firstName secondName mobile birthDate placeOfBirth address savedPrograms');
         if (user) {
             res.status(200).json(user);
         } else {
@@ -82,11 +82,19 @@ const getUserData = async (req, res) => {
 }
 
 const updateUser = async (req, res) => {
-    const { email, firstName, secondName, password, mobile, placeOfBirth, birthDate, address } = req.body;
-    console.log(req.body);
+    const { email, firstName, secondName, password, mobile, placeOfBirth, birthDate, address, programId } = req.body;
     const userId = req.user._id; 
     try {
+        let updateFields = {};
+        
+        // Felhasználó keresése az adatbázisban
         const user = await User.findOne({ _id: userId });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Jelszó frissítése
         if (password){
             const match = await bcrypt.compare(password, user.password)
             console.log(match);
@@ -98,22 +106,35 @@ const updateUser = async (req, res) => {
             }
             const salt = await bcrypt.genSalt(10)
             const hash = await bcrypt.hash(password, salt)
-            user.password = hash;
-        }
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            updateFields.password = hash;
         }
 
-        user.email = email;
-        user.firstName = firstName;
-        user.secondName = secondName;
-        user.mobile = mobile;
-        user.placeOfBirth = placeOfBirth;
-        user.birthDate = birthDate;
-        user.address = address;
+        // Egyéb mezők frissítése, ha meg vannak adva
+        if (email) updateFields.email = email;
+        if (firstName) updateFields.firstName = firstName;
+        if (secondName) updateFields.secondName = secondName;
+        if (mobile) updateFields.mobile = mobile;
+        if (placeOfBirth) updateFields.placeOfBirth = placeOfBirth;
+        if (birthDate) updateFields.birthDate = birthDate;
+        if (address) updateFields.address = address;
 
-        await user.save();
-        res.status(200).json({ message: 'User updated successfully', user });
+        if (programId) {
+            if (!user.savedPrograms.includes(programId)) {
+                user.savedPrograms.push(programId);
+                await user.save();
+                return res.status(200).json({ message: 'Program hozzáadva a felhasználóhoz' });
+            } else {
+                user.savedPrograms.pull(programId);
+                await user.save();
+                return res.status(200).json({ message: 'Program eltávolítva a felhasználótól' });
+            }
+        }
+        
+
+        // Felhasználó frissítése az adatbázisban
+        const updatedUser = await User.findOneAndUpdate({ _id: userId }, updateFields, { new: true });
+
+        res.status(200).json({ message: 'User updated successfully', updatedUser });
     } catch (error) {
         console.error('Error updating user:', error);
         res.status(500).json({ message: 'Internal Server Error' });

@@ -1,19 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useUserdataContext } from "../hooks/useUserdataContext";
-import { useLogout } from '../hooks/useLogout'
-import UpdateUserdata from '../components/UpdateUserdata'
+import UpdateUserdata from "../components/UpdateUserdata";
 import AccessDenied from "../components/AccessDenied";
+import ProgramSaveButton from "../components/ProgramSaveButton";
 
 const Profile = () => {
-  const {logout} = useLogout()
   const { user } = useAuthContext();
   const { userdata, dispatch } = useUserdataContext();
   const [isUpdating, setIsUpdating] = useState(false);
+  const [savedPrograms, setSavedPrograms] = useState([]);
+  const [programs, setPrograms] = useState([]);
 
   function Editing() {
     setIsUpdating((prev) => !prev);
   }
+
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        const response = await fetch("http://localhost:3500/api/program/get");
+        if (response.ok) {
+          const programsData = await response.json();
+          setPrograms(programsData);
+        } else {
+          console.error("Failed to fetch programs");
+        }
+      } catch (error) {
+        console.error("Error fetching programs:", error);
+      }
+    };
+
+    fetchPrograms();
+  }, []);
+
+  useEffect(() => {
+    if (userdata) {
+      setSavedPrograms(userdata.savedPrograms);
+    }
+  }, [userdata]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,23 +49,31 @@ const Profile = () => {
       });
 
       const json = await response.json();
-      
 
       if (response.ok) {
         dispatch({ type: "GET_USERDATA", payload: json });
-      }
-      else {
-        logout()
       }
     };
 
     if (user) {
       fetchData();
     }
-  }, [dispatch, user, userdata]);
+  }, [dispatch, user]);
 
-  if(!user){
-    return <AccessDenied />
+  const handleProgramSave = async (programId) => {
+    console.log(programId);
+    const response = await fetch("http://localhost:3500/api/user/update", {
+      method: "POST", // Assuming you are sending data as a POST request
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+      body: JSON.stringify({ programId }),
+    });
+  };
+
+  if (!user) {
+    return <AccessDenied />;
   }
 
   return (
@@ -53,37 +86,80 @@ const Profile = () => {
       ) : (
         <div>
           {userdata ? (
-            <div>
-              <h2>Profil</h2>
-              <table>
-                <tr>
-                  <td>Név:</td>
-                  <td>{userdata.secondName + " " + userdata.firstName}</td>
-                </tr>
-                <tr>
-                  <td>Email-cím:</td>
-                  <td>{userdata.email}</td>
-                </tr>
-                <tr>
-                  <td>Mobil:</td>
-                  <td>{userdata.mobile}</td>
-                </tr>
-                <tr>
-                  <td>Születési dátum:</td>
-                  <td>{userdata.birthDate}</td>
-                </tr>
-                <tr>
-                  <td>Születési hely:</td>
-                  <td>{userdata.placeOfBirth}</td>
-                </tr>
-                <tr>
-                  <td>Cím:</td>
-                  <td>{userdata.address}</td>
-                </tr>
-              </table>
-              <button onClick={Editing}>Adatok megváltoztatása</button>
-              
-            </div>
+            <>
+              <div>
+                <h2>Profil</h2>
+                <table>
+                  <tr>
+                    <td>Név:</td>
+                    <td>{userdata.secondName + " " + userdata.firstName}</td>
+                  </tr>
+                  <tr>
+                    <td>Email-cím:</td>
+                    <td>{userdata.email}</td>
+                  </tr>
+                  <tr>
+                    <td>Mobil:</td>
+                    <td>{userdata.mobile}</td>
+                  </tr>
+                  <tr>
+                    <td>Születési dátum:</td>
+                    <td>{userdata.birthDate}</td>
+                  </tr>
+                  <tr>
+                    <td>Születési hely:</td>
+                    <td>{userdata.placeOfBirth}</td>
+                  </tr>
+                  <tr>
+                    <td>Cím:</td>
+                    <td>{userdata.address}</td>
+                  </tr>
+                </table>
+                <button onClick={Editing}>Adatok megváltoztatása</button>
+              </div>
+              <div>
+                <h2>Mentett Programjaim</h2>
+                <div className="programs">
+                  {programs
+                    .filter((program) => savedPrograms.includes(program._id))
+                    .map((program) => (
+                      <div className="program" key={program.id}>
+                        <h3>{program.name}</h3>
+                        <img src={program.img.url} alt="kép a programról" />
+                        <div className="programDetails">
+                          <div>
+                            <p>Fő: </p>
+                            <p>
+                              {program.persons.min} - {program.persons.max}
+                            </p>
+                          </div>
+                          <div>
+                            <p>Hely:</p>
+                            <p>
+                              {program.location.county} vármegye, &nbsp;
+                              {program.location.city},&nbsp;
+                              {program.location.address}
+                            </p>
+                          </div>
+                          <div>
+                            <p>Ár:</p>
+                            <p>{program.price} Ft/fő</p>
+                          </div>
+                        </div>
+                        {user ? (
+                          <ProgramSaveButton
+                            savedPrograms={savedPrograms}
+                            programId={program._id} // A program azonosítója
+                            onProgramSave={(programId) =>
+                              handleProgramSave(programId)
+                            }
+                          />
+                        ) : null}
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </>
           ) : null}
         </div>
       )}

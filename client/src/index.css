@@ -520,7 +520,6 @@ form.addProgram #submitButton button{
   width: 20vw;
 }
 
-
 .error {
   text-align: center;
   padding: 10px;
@@ -597,6 +596,7 @@ form.addProgram #submitButton button{
 }
 
 .programs {
+  text-align: center;
   width: 100%;
   display: grid;
   gap: 20px;
@@ -654,3 +654,4 @@ form.addProgram #submitButton button{
   width:100% ;
   color: white;
 }
+
