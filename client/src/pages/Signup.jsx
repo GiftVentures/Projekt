@@ -118,6 +118,7 @@ const Signup = () => {
         </ul>
       </div>
       <button disabled={isLoading}>Regisztráció</button>
+      <p >A weboldal regisztrációjával elfogadod az <a className='aszf' target='_blank' href="https://webshippy.com/wp-content/uploads/webshop-ingyenes-ASZF-minta.pdf">ÁSZF feltételeit</a></p>
       {displayedError && <div className='error'>{displayedError}</div>}
       {!displayedError && error && <div className='error'>{error}</div>}
     </form>

@@ -94,4 +94,18 @@ const AddProgram = async (req, res) => {
   };
   
 
-  module.exports = { AddProgram, DeleteProgram, getAllThemes, uploadImage, getAllPrograms};
+  const getOneProgram = async (req, res) => {
+    const programId = req.params.programId;
+    try {
+      const program = await Program.findById(programId);
+      if (!program) {
+        return res.status(404).json("A program nem található");
+      }
+      res.status(200).json(program);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json("Belső szerverhiba történt");
+    }
+  };
+  
+  module.exports = { AddProgram, DeleteProgram, getAllThemes, uploadImage, getAllPrograms, getOneProgram };

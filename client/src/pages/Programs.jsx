@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import jsonData from "../data/megyek.json";
 import ProgramSaveButton from "../components/ProgramSaveButton";
 import { useAuthContext } from "../hooks/useAuthContext";
+import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 const Programs = () => {
   const { user } = useAuthContext();
@@ -27,6 +29,8 @@ const Programs = () => {
   const [cities, setCities] = useState([]);
 
   const [savedPrograms, setSavedPrograms] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -122,7 +126,7 @@ const Programs = () => {
           program.persons.max <= maxPersons &&
           program.price <= maxPrice && // Árszűrés
           (selectedThemes.length === 0 ||
-            selectedThemes.some((selectedTheme) =>
+            selectedThemes.every((selectedTheme) =>
               program.theme.includes(selectedTheme)
             )) &&
           // Dátumszűrés
@@ -157,8 +161,12 @@ const Programs = () => {
         Authorization: `Bearer ${user.token}`,
       },
       body: JSON.stringify({ programId }),
-    })
+    });
   };
+
+  function handleProgramClick(programId) {
+    navigate(`/programs/${programId}`);
+  }
 
   return (
     <div className="program-container">
@@ -254,42 +262,51 @@ const Programs = () => {
           <button onClick={handleSearch}>Keresés</button>
         </div>
       </div>
-      <div className="programs">
-        <h2>Programok</h2>
-        {filteredPrograms.map((program) => (
-          <div className="program" key={program.id}>
-            <h3>{program.name}</h3>
-            <img src={program.img.url} alt="kép a programról" />
-            <div className="programDetails">
-              <div>
-                <p>Fő: </p>
-                <p>
-                  {program.persons.min} - {program.persons.max}
-                </p>
+      {programs ? (
+        <div className="programs">
+          <h2>Programok</h2>
+          {filteredPrograms.map((program) => (
+            <div
+              className="program"
+              key={program.id}
+            >
+              <div onClick={() => handleProgramClick(program._id)}>
+                <h3>{program.name}</h3>
+                <img src={program.img.url} alt="kép a programról" />
+                <div className="programDetails">
+                  <div>
+                    <p>Fő: </p>
+                    <p>
+                      {program.persons.min} - {program.persons.max}
+                    </p>
+                  </div>
+                  <div>
+                    <p>Hely:</p>
+                    <p>
+                      {program.location.county} vármegye, &nbsp;
+                      {program.location.city},&nbsp;
+                      {program.location.address}
+                    </p>
+                  </div>
+                  <div>
+                    <p>Ár:</p>
+                    <p>{program.price} Ft/fő</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p>Hely:</p>
-                <p>
-                  {program.location.county} vármegye, &nbsp;
-                  {program.location.city},&nbsp;
-                  {program.location.address}
-                </p>
-              </div>
-              <div>
-                <p>Ár:</p>
-                <p>{program.price} Ft/fő</p>
-              </div>
+              {user ? (
+                <ProgramSaveButton
+                  savedPrograms={savedPrograms}
+                  programId={program._id} // A program azonosítója
+                  onProgramSave={(programId) => handleProgramSave(programId)}
+                />
+              ) : null}
             </div>
-            {user ? (
-              <ProgramSaveButton
-                savedPrograms={savedPrograms}
-                programId={program._id} // A program azonosítója
-                onProgramSave={(programId) => handleProgramSave(programId)}
-              />
-            ) : null}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <Loader />
+      )}
     </div>
   );
 };

@@ -4,6 +4,8 @@ import { useUserdataContext } from "../hooks/useUserdataContext";
 import UpdateUserdata from "../components/UpdateUserdata";
 import AccessDenied from "../components/AccessDenied";
 import ProgramSaveButton from "../components/ProgramSaveButton";
+import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 const Profile = () => {
   const { user } = useAuthContext();
@@ -11,6 +13,8 @@ const Profile = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [savedPrograms, setSavedPrograms] = useState([]);
   const [programs, setPrograms] = useState([]);
+
+  const navigate = useNavigate();
 
   function Editing() {
     setIsUpdating((prev) => !prev);
@@ -76,6 +80,10 @@ const Profile = () => {
     return <AccessDenied />;
   }
 
+  function handleProgramClick(programId) {
+    navigate(`/programs/${programId}`);
+  }
+
   return (
     <div>
       {isUpdating ? (
@@ -123,27 +131,32 @@ const Profile = () => {
                   {programs
                     .filter((program) => savedPrograms.includes(program._id))
                     .map((program) => (
-                      <div className="program" key={program.id}>
-                        <h3>{program.name}</h3>
-                        <img src={program.img.url} alt="kép a programról" />
-                        <div className="programDetails">
-                          <div>
-                            <p>Fő: </p>
-                            <p>
-                              {program.persons.min} - {program.persons.max}
-                            </p>
-                          </div>
-                          <div>
-                            <p>Hely:</p>
-                            <p>
-                              {program.location.county} vármegye, &nbsp;
-                              {program.location.city},&nbsp;
-                              {program.location.address}
-                            </p>
-                          </div>
-                          <div>
-                            <p>Ár:</p>
-                            <p>{program.price} Ft/fő</p>
+                      <div
+                        className="program"
+                        key={program.id}
+                      >
+                        <div onClick={() => handleProgramClick(program._id)}>
+                          <h3>{program.name}</h3>
+                          <img src={program.img.url} alt="kép a programról" />
+                          <div className="programDetails">
+                            <div>
+                              <p>Fő: </p>
+                              <p>
+                                {program.persons.min} - {program.persons.max}
+                              </p>
+                            </div>
+                            <div>
+                              <p>Hely:</p>
+                              <p>
+                                {program.location.county} vármegye, &nbsp;
+                                {program.location.city},&nbsp;
+                                {program.location.address}
+                              </p>
+                            </div>
+                            <div>
+                              <p>Ár:</p>
+                              <p>{program.price} Ft/fő</p>
+                            </div>
                           </div>
                         </div>
                         {user ? (
@@ -160,7 +173,7 @@ const Profile = () => {
                 </div>
               </div>
             </>
-          ) : null}
+          ) : (<Loader />)}
         </div>
       )}
     </div>

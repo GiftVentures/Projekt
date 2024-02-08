@@ -261,6 +261,10 @@ nav .signupContainer .register:hover {
   border: 2px solid var(--primary);
 }
 
+.aszf {
+  color: rgb(100, 100, 100);
+}
+
 nav .login {
   color: #fff;
   height: max-content;
@@ -633,7 +637,8 @@ form.addProgram #submitButton button{
 }
 
 .program {
-  margin-top: 0;
+    margin-bottom: 3vh;
+  margin-top:3vh;
   margin-left: 20px;
   margin-right: 20px;
   height: max-content;
@@ -641,6 +646,12 @@ form.addProgram #submitButton button{
   border-radius: 30px;
   overflow: hidden;
   background-color: var(--primary);
+  transition: 0.3s;
+}
+
+.program:hover{ 
+  cursor: pointer;
+  margin-top: 1vh;
 }
 
 .program .programDetails{
