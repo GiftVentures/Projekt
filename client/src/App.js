@@ -4,22 +4,22 @@ import { useAuthContext } from './hooks/useAuthContext'
 import { useEffect, useState } from 'react';
 import { TransparentNavbar } from './TransparentNavbar';
 
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import Navbar from './components/Navbar';
-import Main from './pages/Main';
-import Profile from './pages/Profile';
-import ChangePassword from './pages/ChangePassword';
-import About from './pages/About';
-import AddProgram from './pages/AdminPages/AddProgram';
-import Error404 from './pages/Error404';
-import Programs from './pages/Programs';
-import Program from './pages/Program';
+import Login from './pages/Login/Login';
+import Signup from './pages/Signup/Signup';
+import Navbar from './components/Navbar/Navbar';
+import Main from './pages/Main/Main';
+import Profile from './pages/Profile/Profile';
+import ChangePassword from './pages/ChangePassword/ChangePassword';
+import About from './pages/About/About';
+import AddProgram from './pages/AdminPages/AddProgram/AddProgram';
+import Error404 from './pages/Error/Error404';
+import Programs from './pages/Programs/Programs';
+import Program from './pages/Program/Program';
+import ResetPasswordPage from './components/ResetPasswordPage/ResetPasswordPage';
 
 
 
 function App() {
-
   const { user } = useAuthContext()
   const [isAdmin, setAdmin] = useState(false)
 
@@ -45,6 +45,7 @@ function App() {
             
             <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />}/>
             <Route path="/passwordChange" element={user ? <ChangePassword /> : <Navigate to="/login" /> }/>
+            <Route path="/reset-password/:userId/:token" element={<ResetPasswordPage /> } />
               
             <Route path="/login" element={user ? <Navigate to="/profile" /> : <Login /> }/>
             <Route path="/signup" element={user ? <Navigate to="/profile" /> : <Signup /> }/>

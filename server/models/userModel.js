@@ -99,8 +99,18 @@ userSchema.statics.login = async function (email,password) {
         throw Error('Hibás jelszó')
     }
 
-    return user
+    return user;
 }
+
+userSchema.statics.loginwithlink = async function (id) {
+    const user = await this.findOne({_id: id})
+    if(!user){
+        throw Error('Ez a felhasználó nem létezik!')
+    }
+    return user;
+}
+
+
 
 
 module.exports = mongoose.model('User', userSchema)

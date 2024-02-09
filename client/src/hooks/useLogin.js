@@ -31,5 +31,28 @@ export const useLogin = () => {
     }
   }
 
-  return { login, isLoading, error }
+  const loginWithLink = async (id, token) =>{
+    setIsLoading(true)
+    setError(null)
+
+    const response = await fetch('http://localhost:3500/api/user/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ id, token })
+    })
+    const json = await response.json()
+
+    if (!response.ok) {
+      setIsLoading(false)
+      setError(json.error)
+    }
+    if (response.ok) {
+      localStorage.setItem('user', JSON.stringify(json))
+      dispatch({type: 'LOGIN', payload: json})
+      setIsLoading(false)
+      navigate("/passwordChange")
+    }
+  }
+
+  return { login, isLoading, error, loginWithLink }
 }
