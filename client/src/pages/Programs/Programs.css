@@ -28,7 +28,6 @@
   -webkit-box-shadow: -10px 10px 24px 0px rgba(0, 0, 0, 0.69) inset;
   -moz-box-shadow: -10px 10px 24px 0px rgba(0, 0, 0, 0.69) inset;
   border: solid 1px black;
-
   display: flex;
   flex-direction: column;
   background-color: var(--primary);
@@ -122,6 +121,7 @@
 }
 
 .program {
+  position: relative; 
   margin-bottom: 3vh;
   margin-top: 3vh;
   margin-left: 20px;
@@ -137,11 +137,26 @@
 .program:hover {
   cursor: pointer;
   margin-top: 1vh;
+  height: auto; 
+  position: relative;
 }
 
 .program .programDetails {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  /*background-color: rgba(255, 255, 255, 0.9);*/
+  background-color: var(--primary);
+  padding: 10px;
+  box-sizing: border-box;
+  border-radius: 0 0 30px 30px;
+  transition: display 0.3s ease;
+}
+
+.program:hover .programDetails {
+  display: block;
 }
 
 .program .programDetails div {
@@ -149,6 +164,7 @@
   background-color: var(--secondary);
   width: 100%;
   color: white;
+  border-radius: 5px;
 }
 
 .program-container {

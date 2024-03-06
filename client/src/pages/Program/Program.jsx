@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Loader from '../../components/Loader/Loader';
+import './Program.css'
 
 const Program = () => {
   const { programId } = useParams();

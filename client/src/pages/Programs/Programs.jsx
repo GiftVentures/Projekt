@@ -207,6 +207,7 @@ const Programs = () => {
             type="number"
             value={maxPrice}
             min={0}
+            max={1000000}
             step={1000}
             onChange={(e) => setMaxPrice(parseInt(e.target.value))}
           />

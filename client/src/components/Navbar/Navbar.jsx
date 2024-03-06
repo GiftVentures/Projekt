@@ -40,8 +40,9 @@ const Navbar = () => {
   return (
     <header id='header' className='header'>
       <div className='container'>
-        <Link to={"/"}>
-          <h1 id='main'>GiftVentures</h1>
+        <Link to={"/"} style={{ textDecoration: 'none' }} className="logo-container">
+          <h1 id='main'>GiftVentures</h1> 
+          <img src={require("../../IMG/gvlg.png")} alt="Logo" className="logo" />
         </Link>
         <nav>
         <Link to={"/"}>

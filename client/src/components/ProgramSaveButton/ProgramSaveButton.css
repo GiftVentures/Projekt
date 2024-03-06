@@ -4,6 +4,7 @@
     justify-content: space-around;
     color: rgb(255, 91, 137);
     background-color: pink;
+    border-radius: 5px;
 }
 
 .program-save-button h3{
